@@ -21,19 +21,16 @@ import {
 import { PlusCircleIcon } from "@heroicons/react/solid";
 import { IconDelete } from "@supabase/ui";
 
+import { toast } from "react-toastify";
 const navigation = [
   { name: "Kontrolpanel", href: "#", icon: HomeIcon, current: true },
   { name: "Medarbejdere", href: "#", icon: UsersIcon, current: false },
-  // { name: "Projects", href: "#", icon: FolderIcon, current: false },
-  // { name: "Calendar", href: "#", icon: CalendarIcon, current: false },
-  // { name: "Documents", href: "#", icon: InboxIcon, current: false },
-  // { name: "Reports", href: "#", icon: ChartBarIcon, current: false },
 ];
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
 }
-export default function kontrolpanel({ session }) {
+export default function Kontrolpanel({ session }) {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [startDate, setStartDate] = useState(new Date());
   const [timetrackData, setTimetrackData] = useState([]);
@@ -116,6 +113,16 @@ export default function kontrolpanel({ session }) {
       beskrivelse: beskrivelse,
     });
 
+    toast.success("🎉 Tracking oprettet!", {
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
     console.log(data);
     //Opdater UI
     getTidsregistrering();
@@ -123,7 +130,7 @@ export default function kontrolpanel({ session }) {
 
   //Sikkerhed for at vi har alle medarbejdere
   useEffect(() => {
-    medarbejdere.length > 0 ? "" : getMedarbejdere();
+    medarbejdere?.length > 0 ? "" : getMedarbejdere();
   }, [medarbejdere]);
 
   //Slet timetrack
@@ -132,6 +139,18 @@ export default function kontrolpanel({ session }) {
       .from("timetrack")
       .delete()
       .match({ id, id });
+
+    toast.success("Tracking slettet!", {
+      toastId: id,
+      position: "top-right",
+      autoClose: 5000,
+      hideProgressBar: false,
+      closeOnClick: true,
+      pauseOnHover: true,
+      draggable: true,
+      progress: undefined,
+    });
+
     //opdater UI
     getTidsregistrering();
   }
@@ -140,7 +159,7 @@ export default function kontrolpanel({ session }) {
   const filteredPeople =
     query === ""
       ? medarbejdere
-      : medarbejdere.filter((person) => {
+      : medarbejdere?.filter((person) => {
           console.log(person.name);
           return person?.username.toLowerCase().includes(query.toLowerCase());
         });
@@ -310,7 +329,7 @@ export default function kontrolpanel({ session }) {
                 </div>
               </div>
 
-              {timetrackData.length > 0 ? (
+              {timetrackData?.length > 0 ? (
                 <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
                   <div className="mt-8 flex flex-col">
                     <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -441,7 +460,7 @@ export default function kontrolpanel({ session }) {
         <div className="modal-box">
           <div className="form-control w-full relative ">
             <label
-              for="my-modal-6"
+              htmlFor="my-modal-6"
               className="btn btn-sm btn-circle absolute right-2 top-2 bg-red-700 border-0"
             >
               ✕
@@ -478,7 +497,7 @@ export default function kontrolpanel({ session }) {
                   />
                 </Combobox.Button>
 
-                {filteredPeople.length > 0 && (
+                {filteredPeople?.length > 0 && (
                   <Combobox.Options className="absolute z-10 mt-1 max-h-56 w-full overflow-auto rounded-md bg-slate-600 py-1 text-base shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none sm:text-sm">
                     {filteredPeople.map((person) => (
                       <Combobox.Option

@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState } from "react";
 import { supabase } from "../utils/SupabaseClient";
 
-export default function opret() {
+export default function Opret() {
   const [brugernavn, setbrugernavn] = useState("");
   const [password, setpassword] = useState("");
   const [email, setemail] = useState("");

@@ -21,7 +21,8 @@
     "react-calendar": "^3.7.0",
     "react-datepicker": "^4.8.0",
     "react-dom": "18.2.0",
-    "react-scripts": "^5.0.1"
+    "react-scripts": "^5.0.1",
+    "react-toastify": "^9.0.4"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.7",

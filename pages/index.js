@@ -2,7 +2,7 @@ import Link from "next/link";
 import { useState, useEffect } from "react";
 import { supabase } from "../utils/SupabaseClient";
 import { useRouter } from "next/router";
-export default function index() {
+export default function Index() {
   const router = useRouter();
   const [errorMsg, seterrorMsg] = useState("");
   const [password, setpassword] = useState("");
