@@ -38,7 +38,11 @@ export default function Kontrolpanel({ session }) {
   const [selectedPerson, setSelectedPerson] = useState();
   const [userData, setuserData] = useState(null);
   const [query, setQuery] = useState("");
+  const [isDisabled, setisDisabled] = useState(true);
+  const [q, setQ] = useState("");
+  const [søgKunde, setSøgKunde] = useState("");
   const [kunde, setKunde] = useState("");
+  const [søgVarrighed, setSøgVarrighed] = useState(null);
   const [kontaktPerson, setKontaktPerson] = useState("");
   const [varighed, setVarighed] = useState(0);
   const [beskrivelse, setBeskrivelse] = useState("");
@@ -48,6 +52,30 @@ export default function Kontrolpanel({ session }) {
   useEffect(() => {
     user ? console.log(user) : router.push("/");
   }, []);
+
+  useEffect(() => {
+    if (selectedPerson === null) {
+      setisDisabled(true);
+      return;
+    } else if (varighed === 0) {
+      setisDisabled(true);
+      return;
+    } else if (kunde.length <= 0) {
+      setisDisabled(true);
+      return;
+    } else if (startDate.length <= 0) {
+      setisDisabled(true);
+      return;
+    } else if (kontaktPerson.length <= 0) {
+      setisDisabled(true);
+      return;
+    } else if (beskrivelse.length <= 0) {
+      setisDisabled(true);
+      return;
+    } else {
+      setisDisabled(false);
+    }
+  }, [startDate, selectedPerson, kunde, kontaktPerson, varighed, beskrivelse]);
 
   //Hent data fra Supabase på bruger som er logget ind
   async function getLoggedinUser() {
@@ -123,6 +151,15 @@ export default function Kontrolpanel({ session }) {
       progress: undefined,
     });
 
+    //Reset form
+    setBeskrivelse("");
+    setKunde("");
+    setKontaktPerson("");
+    setVarighed(0);
+    setStartDate(new Date());
+    setSelectedPerson(null);
+    setisDisabled(true);
+
     console.log(data);
     //Opdater UI
     getTidsregistrering();
@@ -153,6 +190,17 @@ export default function Kontrolpanel({ session }) {
 
     //opdater UI
     getTidsregistrering();
+  }
+
+  function filters(timetrackData) {
+    return timetrackData.filter(
+      (timetrackData) =>
+        timetrackData?.created_by?.toLowerCase().includes(q.toLowerCase()) &&
+        (søgKunde.length > 0
+          ? timetrackData?.kunde?.toLowerCase().includes(søgKunde.toLowerCase())
+          : true) &&
+        (søgVarrighed > 0 ? timetrackData?.varighed > søgVarrighed : true)
+    );
   }
 
   //Combobox for at vælge medarbejder + client-side filtering
@@ -330,114 +378,146 @@ export default function Kontrolpanel({ session }) {
               </div>
 
               {timetrackData?.length > 0 ? (
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                  <div className="mt-8 flex flex-col">
-                    <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                      <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
-                        <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
-                          <table className="min-w-full divide-y divide-gray-300">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th
-                                  scope="col"
-                                  className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-900 sm:pl-6"
-                                >
-                                  Medarbejder
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                >
-                                  Varrighed
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                >
-                                  Kunde
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                >
-                                  Kontakt person
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                >
-                                  Beskrivelse
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-3 py-3.5 text-left text-sm font-semibold text-gray-900"
-                                >
-                                  Slet
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="relative py-3.5 pl-3 pr-4 sm:pr-6"
-                                >
-                                  <span className="sr-only">Edit</span>
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="divide-y  bg-slate-500">
-                              {timetrackData.map((timetrack, index) => (
-                                <tr
-                                  key={timetrack.created_by}
-                                  className={
-                                    index % 2 === 0 ? undefined : "bg-slate-900"
-                                  }
-                                >
-                                  <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
-                                    <div className="flex items-center">
-                                      <div className="h-10 w-10 flex-shrink-0">
-                                        <div className="w-10 rounded-full">
-                                          <span className="text-3xl ">
-                                            {timetrack?.created_by.slice(0, 1)}
-                                          </span>
-                                        </div>
-                                      </div>
-                                    </div>
-                                  </td>
-                                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    <div className=" badge ">
-                                      {timetrack.varighed} timer
-                                    </div>
-                                  </td>
-                                  <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
-                                    <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
-                                      {timetrack.kunde}
-                                    </span>
-                                  </td>
-                                  <td className="whitespace-nowrap px-3 py-4 text-sm text-white">
-                                    {timetrack.kontaktperson}
-                                  </td>
-                                  <td className="whitespace-nowrap px-3 py-4 text-sm text-white">
-                                    {timetrack.beskrivelse}
-                                  </td>
-                                  <td className="whitespace-nowrap px-3 py-4 text-sm text-white">
-                                    <IconDelete
-                                      className="text-red-600"
-                                      onClick={(e) =>
-                                        deleteTimeRegistration(timetrack.id)
-                                      }
-                                    />
-                                  </td>
-
-                                  <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"></td>
+                <>
+                  <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                    <div className="grid grid-cols-5 gap-4">
+                      <input
+                        type="text"
+                        placeholder="Søg på medarbejder"
+                        value={q}
+                        onChange={(e) => setQ(e.target.value)}
+                        className="input-bordered input mb-2 w-full max-w-xs mr-2"
+                      />
+                      <input
+                        type="text"
+                        placeholder="Søg på kunde"
+                        value={søgKunde}
+                        onChange={(e) => setSøgKunde(e.target.value)}
+                        className="input-bordered input mb-2 w-full max-w-xs mr-2"
+                      />
+                      <input
+                        type="number"
+                        placeholder="Varighed større end"
+                        value={søgVarrighed}
+                        onChange={(e) => setSøgVarrighed(e.target.value)}
+                        className="input-bordered input mb-2 w-full max-w-xs"
+                      />
+                    </div>
+                    <div className="mt-8 flex flex-col">
+                      <div className="-my-2 -mx-4 overflow-x-auto sm:-mx-6 lg:-mx-8">
+                        <div className="inline-block min-w-full py-2 align-middle md:px-6 lg:px-8">
+                          <div className="overflow-hidden shadow ring-1 ring-black ring-opacity-5 md:rounded-lg">
+                            <table className="min-w-full divide-y divide-gray-300">
+                              <thead className="bg-gray-800">
+                                <tr>
+                                  <th
+                                    scope="col"
+                                    className="py-3.5 pl-4 pr-3 text-left text-sm font-semibold text-gray-200 sm:pl-6"
+                                  >
+                                    Medarbejder
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-200"
+                                  >
+                                    Varrighed
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-200"
+                                  >
+                                    Kunde
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-200"
+                                  >
+                                    Kontakt person
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-200"
+                                  >
+                                    Beskrivelse
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="px-3 py-3.5 text-left text-sm font-semibold text-gray-200"
+                                  >
+                                    Slet
+                                  </th>
+                                  <th
+                                    scope="col"
+                                    className="relative py-3.5 pl-3 pr-4 sm:pr-6"
+                                  >
+                                    <span className="sr-only">Edit</span>
+                                  </th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
+                              </thead>
+                              <tbody className="divide-y  bg-slate-700">
+                                {filters(timetrackData).map(
+                                  (timetrack, index) => (
+                                    <tr
+                                      key={timetrack.created_by}
+                                      className={
+                                        index % 2 === 0
+                                          ? undefined
+                                          : "bg-slate-900"
+                                      }
+                                    >
+                                      <td className="whitespace-nowrap py-4 pl-4 pr-3 text-sm sm:pl-6">
+                                        <div className="flex items-center">
+                                          <div className="h-10 w-10 flex-shrink-0">
+                                            <div className="w-10 rounded-full">
+                                              <span className="text-3xl ">
+                                                {timetrack?.created_by.slice(
+                                                  0,
+                                                  1
+                                                )}
+                                              </span>
+                                            </div>
+                                          </div>
+                                        </div>
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        <div className=" badge ">
+                                          {timetrack.varighed} timer
+                                        </div>
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-gray-500">
+                                        <span className="inline-flex rounded-full bg-green-100 px-2 text-xs font-semibold leading-5 text-green-800">
+                                          {timetrack.kunde}
+                                        </span>
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-white">
+                                        {timetrack.kontaktperson}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-white">
+                                        {timetrack.beskrivelse}
+                                      </td>
+                                      <td className="whitespace-nowrap px-3 py-4 text-sm text-white">
+                                        <IconDelete
+                                          className="text-red-600"
+                                          onClick={(e) =>
+                                            deleteTimeRegistration(timetrack.id)
+                                          }
+                                        />
+                                      </td>
+
+                                      <td className="relative whitespace-nowrap py-4 pl-3 pr-4 text-right text-sm font-medium sm:pr-6"></td>
+                                    </tr>
+                                  )
+                                )}
+                              </tbody>
+                            </table>
+                          </div>
                         </div>
                       </div>
                     </div>
-                  </div>
 
-                  {/* /End replace */}
-                </div>
+                    {/* /End replace */}
+                  </div>
+                </>
               ) : (
                 <div className="py-4">
                   <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 max-w-7xl mx-auto flex items-center justify-center">
@@ -587,7 +667,31 @@ export default function Kontrolpanel({ session }) {
             <label
               htmlFor="my-modal-6"
               className="btn bg-green-600 text-white hover:bg-green-800 !border-0"
-              onClick={(e) => createTimeRegistration()}
+              onClick={(e) => {
+                if (selectedPerson === null) {
+                  toast.error("Du skal vælge en medarbejder");
+                  return;
+                } else if (varighed === 0) {
+                  toast.error("Varighed skal udfyldes");
+                  return;
+                } else if (kunde.length < 0) {
+                  toast.error("Kunde skal udfyldes");
+                  return;
+                } else if (startDate.length < 0) {
+                  toast.error("Dato skal udfyldes");
+                  return;
+                } else if (kontaktPerson.length < 0) {
+                  toast.error("Kontaktperson skal udfyldes");
+                  return;
+                } else if (beskrivelse.length < 0) {
+                  toast.error("Beskrivelse skal udfyldes");
+                  return;
+                } else {
+                  createTimeRegistration();
+                  return false;
+                }
+              }}
+              disabled={isDisabled}
             >
               Opret
             </label>

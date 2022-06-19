@@ -7,6 +7,6 @@ const supabaseUrl =
   "https://chhjmxvfeijaeqfbmnam.supabase.co";
 const supabaseAnonKey =
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ||
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoaGpteHZmZWlqYWVxZmJtbmFtIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTY1NTU4OTMxNywiZXhwIjoxOTcxMTY1MzE3fQ.w-atNvmAY6zRbbx40OQ3M1FeQGFkLdPWFZUcQAui5dk";
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImNoaGpteHZmZWlqYWVxZmJtbmFtIiwicm9sZSI6ImFub24iLCJpYXQiOjE2NTU1OTA1MjMsImV4cCI6MTk3MTE2NjUyM30.Pkr3gzIy5a7LhsBKvqM-Iy5-8_hSpvhzgOopwAmsNuI";
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
